@@ -1,49 +1,40 @@
 package order
 
+// OrderService содержит логику расчёта заказов.
 type OrderService struct{}
 
+// NewOrderService создаёт сервис обработки заказов.
 func NewOrderService() *OrderService {
 	return &OrderService{}
 }
 
-// Calc рассчитывает итоговую стоимость всех товаров в корзине
+// CalculateTotal рассчитывает итоговую стоимость всех товаров в корзине
 // с учётом скидки, зависящей от типа клиента.
 //
 // Правила расчёта:
 //   - базовая стоимость — сумма произведений цены товара на его количество;
-//   - для клиента типа "VIP" применяется скидка 10 %;
-//   - для клиента типа "NEW" применяется скидка 5 %;
+//   - для клиента типа ClientTypeVIP применяется скидка 10 %;
+//   - для клиента типа ClientTypeNew применяется скидка 5 %;
 //   - если итоговая сумма после применения скидки превышает 1000,
 //     из неё вычитается фиксированная скидка 50.
 //
-// Порядок применения скидок соответствует исходной реализации:
-// сначала применяется процентная скидка по типу клиента, затем —
-// пороговая скидка 50 при превышении суммы в 1000.
+// Порядок применения скидок: сначала процентная скидка по типу клиента,
+// затем — пороговая скидка при превышении суммы в 1000.
 //
 // @param items      список товаров в корзине (может быть пустым);
-// @param clientType тип клиента ("VIP", "NEW" или любой другой,
-//
-//	для которого процентная скидка не применяется);
-//
+// @param clientType тип клиента, влияющий на применяемую скидку;
 // @return итоговая стоимость заказа после применения всех скидок.
-func (s *OrderService) Calc(items []Item, clientType string) float64 {
-	var sum float64
+func (s *OrderService) CalculateTotal(items []Item, clientType ClientType) float64 {
+	subtotal := calculateSubtotal(items)
+	subtotal = applyClientDiscount(subtotal, clientType)
+	return applyThresholdDiscount(subtotal)
+}
 
+// calculateSubtotal суммирует стоимость всех позиций корзины.
+func calculateSubtotal(items []Item) float64 {
+	var subtotal float64
 	for _, item := range items {
-		sum += item.Price * float64(item.Quantity)
+		subtotal += item.Total()
 	}
-
-	if clientType == "VIP" {
-		sum *= 0.9
-	}
-
-	if clientType == "NEW" {
-		sum *= 0.95
-	}
-
-	if sum > 1000 {
-		sum -= 50
-	}
-
-	return sum
+	return subtotal
 }

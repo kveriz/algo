@@ -7,11 +7,11 @@ import (
 	"github.com/kveriz/algo/14/internal/order"
 )
 
-func TestOrderService_Calc(t *testing.T) {
+func TestOrderService_CalculateTotal(t *testing.T) {
 	tests := []struct {
 		name       string
 		items      []order.Item
-		clientType string
+		clientType order.ClientType
 		want       float64
 	}{
 		{
@@ -19,7 +19,7 @@ func TestOrderService_Calc(t *testing.T) {
 			items: []order.Item{
 				order.NewItem("Book", 100, 2),
 			},
-			clientType: "REGULAR",
+			clientType: order.ClientTypeRegular,
 			want:       200,
 		},
 		{
@@ -27,7 +27,7 @@ func TestOrderService_Calc(t *testing.T) {
 			items: []order.Item{
 				order.NewItem("Book", 100, 2),
 			},
-			clientType: "VIP",
+			clientType: order.ClientTypeVIP,
 			want:       180,
 		},
 		{
@@ -35,7 +35,7 @@ func TestOrderService_Calc(t *testing.T) {
 			items: []order.Item{
 				order.NewItem("Book", 100, 2),
 			},
-			clientType: "NEW",
+			clientType: order.ClientTypeNew,
 			want:       190,
 		},
 		{
@@ -43,7 +43,7 @@ func TestOrderService_Calc(t *testing.T) {
 			items: []order.Item{
 				order.NewItem("Phone", 600, 2),
 			},
-			clientType: "REGULAR",
+			clientType: order.ClientTypeRegular,
 			want:       1150,
 		},
 		{
@@ -51,7 +51,7 @@ func TestOrderService_Calc(t *testing.T) {
 			items: []order.Item{
 				order.NewItem("Phone", 600, 2),
 			},
-			clientType: "VIP",
+			clientType: order.ClientTypeVIP,
 			want:       1030,
 		},
 		{
@@ -59,7 +59,7 @@ func TestOrderService_Calc(t *testing.T) {
 			items: []order.Item{
 				order.NewItem("Phone", 600, 2),
 			},
-			clientType: "NEW",
+			clientType: order.ClientTypeNew,
 			want:       1090,
 		},
 		{
@@ -67,7 +67,7 @@ func TestOrderService_Calc(t *testing.T) {
 			items: []order.Item{
 				order.NewItem("Laptop", 1050, 1),
 			},
-			clientType: "VIP",
+			clientType: order.ClientTypeVIP,
 			want:       945,
 		},
 		{
@@ -75,7 +75,7 @@ func TestOrderService_Calc(t *testing.T) {
 			items: []order.Item{
 				order.NewItem("Laptop", 1100, 1),
 			},
-			clientType: "NEW",
+			clientType: order.ClientTypeNew,
 			want:       995,
 		},
 		{
@@ -83,13 +83,13 @@ func TestOrderService_Calc(t *testing.T) {
 			items: []order.Item{
 				order.NewItem("Laptop", 1000, 1),
 			},
-			clientType: "REGULAR",
+			clientType: order.ClientTypeRegular,
 			want:       1000,
 		},
 		{
 			name:       "empty items",
 			items:      []order.Item{},
-			clientType: "VIP",
+			clientType: order.ClientTypeVIP,
 			want:       0,
 		},
 		{
@@ -98,7 +98,7 @@ func TestOrderService_Calc(t *testing.T) {
 				order.NewItem("Book", 100, 1),
 				order.NewItem("Pen", 200, 2),
 			},
-			clientType: "VIP",
+			clientType: order.ClientTypeVIP,
 			want:       450,
 		},
 		{
@@ -106,7 +106,7 @@ func TestOrderService_Calc(t *testing.T) {
 			items: []order.Item{
 				order.NewItem("Book", 100, 2),
 			},
-			clientType: "GOLD",
+			clientType: order.ClientType("GOLD"),
 			want:       200,
 		},
 	}
@@ -115,9 +115,9 @@ func TestOrderService_Calc(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := service.Calc(tt.items, tt.clientType)
+			got := service.CalculateTotal(tt.items, tt.clientType)
 			if math.Abs(got-tt.want) > 1e-9 {
-				t.Fatalf("Calc() = %v, want %v", got, tt.want)
+				t.Fatalf("CalculateTotal() = %v, want %v", got, tt.want)
 			}
 		})
 	}
