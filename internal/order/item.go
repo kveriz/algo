@@ -7,7 +7,6 @@ type Item struct {
 	Quantity int
 }
 
-// NewItem создаёт новый товар.
 func NewItem(name string, price float64, quantity int) Item {
 	return Item{
 		Name:     name,
