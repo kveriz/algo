@@ -78,6 +78,7 @@ func TestOrderService_CalculateTotal(t *testing.T) {
 			clientType: order.ClientTypeNew,
 			want:       995,
 		},
+		// DTT
 		{
 			name: "exactly 1000 does not apply threshold",
 			items: []order.Item{
@@ -108,6 +109,47 @@ func TestOrderService_CalculateTotal(t *testing.T) {
 			},
 			clientType: order.ClientType("GOLD"),
 			want:       200,
+		},
+		{
+			name: "exactly 10 units — no bulk discount",
+			items: []order.Item{
+				order.NewItem("Book", 100, 10),
+			},
+			clientType: order.ClientTypeRegular,
+			want:       1000,
+		},
+		{
+			name: "11 units — bulk discount applied",
+			items: []order.Item{
+				order.NewItem("Book", 100, 11),
+			},
+			clientType: order.ClientTypeRegular,
+			want:       1039, // 1100 * 0.99 = 1089 → −50 = 1039
+		},
+		{
+			name: "bulk discount prevents threshold",
+			items: []order.Item{
+				order.NewItem("Laptop", 1000, 1),
+				order.NewItem("Pen", 0.5, 10),
+			},
+			clientType: order.ClientTypeRegular,
+			want:       994.95, // 1005 * 0.99 = 994.95 → порог не срабатывает
+		},
+		{
+			name: "bulk discount combined with VIP",
+			items: []order.Item{
+				order.NewItem("Book", 100, 11),
+			},
+			clientType: order.ClientTypeVIP,
+			want:       980.1, // 1100 * 0.9 = 990 → * 0.99 = 980.1
+		},
+		{
+			name: "bulk discount combined with NEW",
+			items: []order.Item{
+				order.NewItem("Book", 100, 11),
+			},
+			clientType: order.ClientTypeNew,
+			want:       984.55, // 1100 * 0.95 = 1045 → * 0.99 = 1034.55 → −50 = 984.55
 		},
 	}
 
